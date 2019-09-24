@@ -9,6 +9,9 @@ namespace HotelBooking.UnitTests
 {
     public class BookingManagerTests
     {
+        static DateTime dateLate = new DateTime(2020, 4, 20);
+        static DateTime dateEarly = new DateTime(2020, 4, 19);
+
         private readonly Mock<IRepository<Room>> _roomRepoMock;
         private readonly Mock<IRepository<Booking>> _bookingRepoMock;
 
@@ -17,8 +20,12 @@ namespace HotelBooking.UnitTests
             _bookingRepoMock = new Mock<IRepository<Booking>>();
         }
 
+        public static IEnumerable<object[]> GetWrongDates() {
+            yield return new object[] { dateLate, dateEarly };
+        }
+
         [Theory]
-        [InlineData("04/20/2020", "04/19/2020")]
+        [MemberData(nameof(GetWrongDates))]
         public void FindAvailableRoom_StartDateNotInTheFuture_ThrowsArgumentException(DateTime start, DateTime end)
         {
             // Arrange
@@ -38,11 +45,11 @@ namespace HotelBooking.UnitTests
                     },
                 });
             var manager = CreateInstance();
-           
+            
 
             // Assert
-            Assert.True(true);
-            //Assert.Throws<ArgumentException>(() => manager.FindAvailableRoom(start, end));
+            //Assert.True(true);
+            Assert.Throws<ArgumentException>(() => manager.FindAvailableRoom(start, end));
         }
 
         public void FindAvailableRoom_RoomAvailable_RoomIdNotMinusOne()
