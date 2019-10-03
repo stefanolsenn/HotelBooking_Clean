@@ -163,5 +163,42 @@ namespace HotelBooking.UnitTests
         {
             return new BookingManager(_bookingRepoMock.Object, _roomRepoMock.Object);
         }
+
+
+        [Fact]
+        public void GetFullyOccupiedDates_TwoRoomsTwoBookingsOneFullyOccupiedDate_ShouldReturnTheFullyOccupiedDate() {
+            //arrange
+            DateTime today = DateTime.Today;
+
+            _bookingRepoMock.Setup(repo => repo.GetAll())
+                .Returns(new List<Booking>()
+                {
+                    new Booking
+                    {
+                        Id = 1, StartDate = DateTime.Today.AddDays(1), EndDate = DateTime.Today.AddDays(2),
+                        IsActive = true, CustomerId = 2, RoomId = 1
+                    },
+                    new Booking
+                    {
+                        Id = 2, StartDate = today, EndDate = DateTime.Today.AddDays(1),
+                        IsActive = true, CustomerId = 2, RoomId = 2
+                    },
+                });
+
+            _roomRepoMock.Setup(repo => repo.GetAll())
+                .Returns(new List<Room>()
+                {
+                    new Room() {Description = "room 1", Id = 1},
+                    new Room() {Description = "room 2", Id = 2},
+                });
+            var manager = CreateInstance();
+
+            //act
+            var result = manager.GetFullyOccupiedDates(today, DateTime.Today.AddDays(2));
+
+            var comparisonResult = DateTime.Compare(DateTime.Today.AddDays(1), result[0]);
+            //assert
+            Assert.True(result.Count == 1 && comparisonResult == 0);
+        }
     }
 }
