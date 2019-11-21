@@ -115,6 +115,25 @@ namespace HotelBooking.UnitTests
             Assert.Equal(-1, result);
         }
 
+        [Theory]
+        [MemberData(nameof(OverlappingDates))]
+        public void FindAvailableRoom_NoRoomsAddedInHotel_ShouldNotBookARoom(DateTime start, DateTime end)
+        {
+            // Arrange
+            _bookingRepoMock.Setup(repo => repo.GetAll())
+                .Returns(new List<Booking>());
+            _roomRepoMock.Setup(repo => repo.GetAll())
+                .Returns(new List<Room>()
+                {
+                });
+            var manager = CreateInstance();
+
+            // Act
+            var result = manager.FindAvailableRoom(start, end);
+
+            // Assert
+            Assert.Equal(-1, result);
+        }
 
         public static IEnumerable<object[]> Bookings()
         {
@@ -166,7 +185,8 @@ namespace HotelBooking.UnitTests
 
 
         [Fact]
-        public void GetFullyOccupiedDates_TwoRoomsTwoBookingsOneFullyOccupiedDate_ShouldReturnTheFullyOccupiedDate() {
+        public void GetFullyOccupiedDates_TwoRoomsTwoBookingsOneFullyOccupiedDate_ShouldReturnTheFullyOccupiedDate()
+        {
             //arrange
             DateTime today = DateTime.Today;
 
